@@ -3,7 +3,7 @@ package ua.edu.ukma.clientserver.dao;
 import java.util.List;
 import java.util.Optional;
 
-public interface GenericDao<T, K> {
+public interface GenericDao<T, K> extends AutoCloseable {
 
 	List<T> getAll();
 
@@ -16,4 +16,6 @@ public interface GenericDao<T, K> {
 	void delete(K id);
 
 	void deleteAll();
+
+	void close();
 }

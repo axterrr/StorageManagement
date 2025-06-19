@@ -13,7 +13,7 @@ public abstract class DaoFactory {
         return daoFactory;
     }
 
-    public abstract ProductDao goodsDao();
+    public abstract ProductDao productDao();
 
     public abstract GroupDao groupDao();
 }

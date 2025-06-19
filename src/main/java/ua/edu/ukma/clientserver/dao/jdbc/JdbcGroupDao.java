@@ -111,6 +111,24 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
     }
 
     @Override
+    public Optional<Group> getByName(String name) {
+        String sql = String.format("SELECT * FROM %s WHERE %s = ?", TABLE_NAME, NAME);
+
+        Group group = null;
+        try (PreparedStatement query = connection.prepareStatement(sql)) {
+            query.setString(1, name);
+            ResultSet resultSet = query.executeQuery();
+            while (resultSet.next()) {
+                group = extractGroupFromResultSet(resultSet);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Optional.ofNullable(group);
+    }
+
+    @Override
     public List<Group> getByParams(GroupSearchParams params) {
         StringBuilder sql = new StringBuilder("SELECT * FROM " + TABLE_NAME);
         List<Object> arguments = new ArrayList<>();

@@ -16,5 +16,5 @@ public class Product {
     private String manufacturer;
     private Integer amount;
     private Double price;
-    private Integer categoryId;
+    private Integer groupId;
 }

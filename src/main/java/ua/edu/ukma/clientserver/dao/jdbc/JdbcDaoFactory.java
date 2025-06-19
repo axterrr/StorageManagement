@@ -13,7 +13,6 @@ public class JdbcDaoFactory extends DaoFactory {
     private static final String PROPERTY_FILE = "application.properties";
     private static final String LOCAL_PROPERTY_FILE = "application-local.properties";
 
-    private static JdbcDaoFactory daoFactory;
     private final DataSource dataSource;
 
     public JdbcDaoFactory() {
@@ -39,7 +38,7 @@ public class JdbcDaoFactory extends DaoFactory {
     }
 
     @Override
-    public JdbcProductDao goodsDao() {
+    public JdbcProductDao productDao() {
         try {
             return new JdbcProductDao(dataSource.getConnection());
         } catch (SQLException e) {
@@ -54,12 +53,5 @@ public class JdbcDaoFactory extends DaoFactory {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static JdbcDaoFactory getDaoFactory() {
-        if (daoFactory == null) {
-            daoFactory = new JdbcDaoFactory();
-        }
-        return daoFactory;
     }
 }

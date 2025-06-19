@@ -44,7 +44,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setString(3, product.getManufacturer());
             query.setInt(4, product.getAmount());
             query.setDouble(5, product.getPrice());
-            query.setInt(6, product.getCategoryId());
+            query.setInt(6, product.getGroupId());
             query.executeUpdate();
 
             ResultSet keys = query.getGeneratedKeys();
@@ -68,7 +68,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setString(3, product.getManufacturer());
             query.setInt(4, product.getAmount());
             query.setDouble(5, product.getPrice());
-            query.setInt(6, product.getCategoryId());
+            query.setInt(6, product.getGroupId());
             query.setInt(7, product.getId());
             query.executeUpdate();
         } catch (SQLException e) {
@@ -120,6 +120,24 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public List<Product> getAll() {
         return getByParams(new ProductSearchParams());
+    }
+
+    @Override
+    public Optional<Product> getByName(String name) {
+        String sql = String.format("SELECT * FROM %s WHERE %s = ?", TABLE_NAME, NAME);
+
+        Product product = null;
+        try (PreparedStatement query = connection.prepareStatement(sql)) {
+            query.setString(1, name);
+            ResultSet resultSet = query.executeQuery();
+            while (resultSet.next()) {
+                product = extractProductFromResultSet(resultSet);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Optional.ofNullable(product);
     }
 
     @Override
@@ -202,7 +220,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             .manufacturer(resultSet.getString(MANUFACTURER))
             .price(resultSet.getDouble(PRICE))
             .amount(resultSet.getInt(AMOUNT))
-            .categoryId(resultSet.getInt(GROUP_ID))
+            .groupId(resultSet.getInt(GROUP_ID))
             .build();
     }
 
