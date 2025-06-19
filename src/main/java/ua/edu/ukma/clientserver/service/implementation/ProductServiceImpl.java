@@ -26,6 +26,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getAll() {
+        try (ProductDao productDao = daoFactory.productDao()) {
+            return productDao.getAll();
+        }
+    }
+
+    @Override
     public Product getById(Integer id) {
         try (ProductDao productDao = daoFactory.productDao()) {
             return productDao.getById(id).orElseThrow(() -> new RuntimeException("Product not found"));

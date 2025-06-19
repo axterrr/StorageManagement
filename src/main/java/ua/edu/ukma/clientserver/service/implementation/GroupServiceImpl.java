@@ -26,6 +26,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public List<Group> getAll() {
+        try (GroupDao groupDao = daoFactory.groupDao()) {
+            return groupDao.getAll();
+        }
+    }
+
+    @Override
     public Group getById(Integer id) {
         try (GroupDao groupDao = daoFactory.groupDao()) {
             return groupDao.getById(id).orElseThrow(() -> new RuntimeException("Group not found"));
