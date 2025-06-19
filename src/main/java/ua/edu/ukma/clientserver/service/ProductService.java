@@ -8,4 +8,8 @@ import java.util.List;
 public interface ProductService extends GenericService<Product, Integer> {
 
     List<Product> search(ProductSearchParams params);
+
+    void increaseAmount(Integer id, Integer amount);
+
+    void decreaseAmount(Integer id, Integer amount);
 }

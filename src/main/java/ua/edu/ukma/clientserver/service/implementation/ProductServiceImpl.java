@@ -61,4 +61,27 @@ public class ProductServiceImpl implements ProductService {
             return productDao.getByParams(params);
         }
     }
+
+    @Override
+    public void increaseAmount(Integer productId, Integer amount) {
+        Product product = getById(productId);
+        int newAmount = product.getAmount() + amount;
+        updateAmount(productId, newAmount);
+    }
+
+    @Override
+    public void decreaseAmount(Integer productId, Integer amount) {
+        Product product = getById(productId);
+        int newAmount = product.getAmount() - amount;
+        if (newAmount < 0) {
+            throw new RuntimeException("Not enough products in stock");
+        }
+        updateAmount(productId, newAmount);
+    }
+
+    private void updateAmount(Integer productId, Integer newAmount) {
+        try (ProductDao productDao = daoFactory.productDao()) {
+            productDao.updateAmount(productId, newAmount);
+        }
+    }
 }

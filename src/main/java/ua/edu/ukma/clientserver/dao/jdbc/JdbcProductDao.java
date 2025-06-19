@@ -160,6 +160,22 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
         return goods;
     }
 
+    @Override
+    public void updateAmount(Integer id, Integer amount) {
+        String sql = String.format(
+            "UPDATE %s SET %s = ? WHERE %s = ?",
+            TABLE_NAME, AMOUNT, ID
+        );
+
+        try (PreparedStatement query = connection.prepareStatement(sql)) {
+            query.setInt(1, amount);
+            query.setInt(2, id);
+            query.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void buildWhereClause(StringBuilder sb, List<Object> arguments, ProductSearchParams params) {
         ArrayList<String> conditions = new ArrayList<>();
 

@@ -11,4 +11,6 @@ public interface ProductDao extends GenericDao<Product, Integer> {
     Optional<Product> getByName(String name);
 
     List<Product> getByParams(ProductSearchParams params);
+
+    void updateAmount(Integer id, Integer amount);
 }
