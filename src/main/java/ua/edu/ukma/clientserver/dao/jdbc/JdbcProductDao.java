@@ -57,8 +57,8 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public void update(Product product) {
         String sql = String.format(
-            "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
-            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, GROUP_ID, ID
+            "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
+            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql)) {
@@ -66,7 +66,6 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setString(2, product.getDescription());
             query.setString(3, product.getManufacturer());
             query.setDouble(4, product.getPrice());
-            query.setInt(5, product.getGroupId());
             query.setInt(6, product.getId());
             query.executeUpdate();
         } catch (SQLException e) {
