@@ -63,6 +63,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getByGroup(Integer groupId) {
+        try (ProductDao productDao = daoFactory.productDao()) {
+            return productDao.getByGroup(groupId);
+        }
+    }
+
+    @Override
     public void increaseAmount(Integer productId, Integer amount) {
         Product product = getById(productId);
         int newAmount = product.getAmount() + amount;

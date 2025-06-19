@@ -9,6 +9,8 @@ public interface ProductService extends GenericService<Product, Integer> {
 
     List<Product> search(ProductSearchParams params);
 
+    List<Product> getByGroup(Integer groupId);
+
     void increaseAmount(Integer id, Integer amount);
 
     void decreaseAmount(Integer id, Integer amount);

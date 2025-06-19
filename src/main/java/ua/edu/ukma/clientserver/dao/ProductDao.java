@@ -13,4 +13,6 @@ public interface ProductDao extends GenericDao<Product, Integer> {
     List<Product> getByParams(ProductSearchParams params);
 
     void updateAmount(Integer id, Integer amount);
+
+    List<Product> getByGroup(Integer groupId);
 }

@@ -143,7 +143,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
         List<Object> arguments = new ArrayList<>();
         buildWhereClause(sql, arguments, params);
 
-        List<Product> goods = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
         try (PreparedStatement query = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < arguments.size(); i++) {
                 query.setObject(i+1, arguments.get(i));
@@ -151,13 +151,13 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
 
             ResultSet resultSet = query.executeQuery();
             while (resultSet.next()) {
-                goods.add(extractProductFromResultSet(resultSet));
+                products.add(extractProductFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        return goods;
+        return products;
     }
 
     @Override
@@ -174,6 +174,24 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Product> getByGroup(Integer groupId) {
+        String sql = String.format("SELECT * FROM %s WHERE %s = ?", TABLE_NAME, GROUP_ID);
+
+        List<Product> products = new ArrayList<>();
+        try (PreparedStatement query = connection.prepareStatement(sql)) {
+            query.setInt(1, groupId);
+            ResultSet resultSet = query.executeQuery();
+            while (resultSet.next()) {
+                products.add(extractProductFromResultSet(resultSet));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return products;
     }
 
     private void buildWhereClause(StringBuilder sb, List<Object> arguments, ProductSearchParams params) {
