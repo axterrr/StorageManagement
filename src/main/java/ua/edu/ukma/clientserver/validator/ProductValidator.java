@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.validator;
 
 import ua.edu.ukma.clientserver.dao.DaoFactory;
+import ua.edu.ukma.clientserver.dao.GroupDao;
 import ua.edu.ukma.clientserver.dao.ProductDao;
 import ua.edu.ukma.clientserver.model.Product;
 
@@ -65,6 +66,12 @@ public class ProductValidator implements BaseValidator<Product> {
     private void validateGroupId(ArrayList<String> errors, Integer groupId) {
         if (groupId == null) {
             errors.add("Group ID is required");
+        } else {
+            try (GroupDao groupDao = daoFactory.groupDao()) {
+                if (groupDao.getById(groupId).isEmpty()) {
+                    errors.add("Group with this ID does not exist");
+                }
+            }
         }
     }
 
