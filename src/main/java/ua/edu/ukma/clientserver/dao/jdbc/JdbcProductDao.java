@@ -34,17 +34,16 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public Integer create(Product product) {
         String sql = String.format(
-            "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, AMOUNT, PRICE, GROUP_ID
+            "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
+            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, GROUP_ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             query.setString(1, product.getName());
             query.setString(2, product.getDescription());
             query.setString(3, product.getManufacturer());
-            query.setInt(4, product.getAmount());
-            query.setDouble(5, product.getPrice());
-            query.setInt(6, product.getGroupId());
+            query.setDouble(4, product.getPrice());
+            query.setInt(5, product.getGroupId());
             query.executeUpdate();
 
             ResultSet keys = query.getGeneratedKeys();
@@ -58,18 +57,17 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public void update(Product product) {
         String sql = String.format(
-            "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
-            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, AMOUNT, PRICE, GROUP_ID, ID
+            "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
+            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, GROUP_ID, ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql)) {
             query.setString(1, product.getName());
             query.setString(2, product.getDescription());
             query.setString(3, product.getManufacturer());
-            query.setInt(4, product.getAmount());
-            query.setDouble(5, product.getPrice());
-            query.setInt(6, product.getGroupId());
-            query.setInt(7, product.getId());
+            query.setDouble(4, product.getPrice());
+            query.setInt(5, product.getGroupId());
+            query.setInt(6, product.getId());
             query.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

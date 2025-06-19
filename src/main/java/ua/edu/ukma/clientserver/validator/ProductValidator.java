@@ -85,18 +85,12 @@ public class ProductValidator implements BaseValidator<Product> {
     }
 
     private void validateAmount(ArrayList<String> errors, Integer amount) {
-        if (amount == null) {
-            errors.add("Amount is required");
-        }
         if (amount != null && amount < 0) {
             errors.add("Amount must be greater than zero");
         }
     }
 
     private void validateManufacturer(ArrayList<String> errors, String manufacturer) {
-        if (manufacturer == null || manufacturer.isEmpty()) {
-            errors.add("Manufacturer is required");
-        }
         if (manufacturer != null && manufacturer.length() > 100) {
             errors.add("Manufacturer is too long");
         }
