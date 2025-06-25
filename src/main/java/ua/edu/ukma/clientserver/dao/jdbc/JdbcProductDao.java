@@ -34,8 +34,8 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public Integer create(Product product) {
         String sql = String.format(
-            "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
-            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, GROUP_ID
+                "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
+                TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, GROUP_ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -57,8 +57,8 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public void update(Product product) {
         String sql = String.format(
-            "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
-            TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, ID
+                "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ? WHERE %s = ?",
+                TABLE_NAME, NAME, DESCRIPTION, MANUFACTURER, PRICE, ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql)) {
@@ -66,7 +66,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setString(2, product.getDescription());
             query.setString(3, product.getManufacturer());
             query.setDouble(4, product.getPrice());
-            query.setInt(6, product.getId());
+            query.setInt(5, product.getId());
             query.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -163,8 +163,8 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
     @Override
     public void updateAmount(Integer id, Integer amount) {
         String sql = String.format(
-            "UPDATE %s SET %s = ? WHERE %s = ?",
-            TABLE_NAME, AMOUNT, ID
+                "UPDATE %s SET %s = ? WHERE %s = ?",
+                TABLE_NAME, AMOUNT, ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql)) {
@@ -245,14 +245,14 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
 
     private static Product extractProductFromResultSet(ResultSet resultSet) throws SQLException {
         return Product.builder()
-            .id(resultSet.getInt(ID))
-            .name(resultSet.getString(NAME))
-            .description(resultSet.getString(DESCRIPTION))
-            .manufacturer(resultSet.getString(MANUFACTURER))
-            .price(resultSet.getDouble(PRICE))
-            .amount(resultSet.getInt(AMOUNT))
-            .groupId(resultSet.getInt(GROUP_ID))
-            .build();
+                .id(resultSet.getInt(ID))
+                .name(resultSet.getString(NAME))
+                .description(resultSet.getString(DESCRIPTION))
+                .manufacturer(resultSet.getString(MANUFACTURER))
+                .price(resultSet.getDouble(PRICE))
+                .amount(resultSet.getInt(AMOUNT))
+                .groupId(resultSet.getInt(GROUP_ID))
+                .build();
     }
 
     @Override
