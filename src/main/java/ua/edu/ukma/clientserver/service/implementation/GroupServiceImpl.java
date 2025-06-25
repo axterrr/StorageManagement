@@ -48,7 +48,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void update(Group group) {
+    public void update(Integer id, Group group) {
+        mergeGroup(group, getById(id));
         GroupValidator.getInstance().validateForUpdate(group);
         try (GroupDao groupDao = daoFactory.groupDao()) {
             groupDao.update(group);
@@ -57,6 +58,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void delete(Integer id) {
+        getById(id);
         try (GroupDao groupDao = daoFactory.groupDao()) {
             groupDao.delete(id);
         }
@@ -66,6 +68,16 @@ public class GroupServiceImpl implements GroupService {
     public List<Group> search(GroupSearchParams params) {
         try (GroupDao groupDao = daoFactory.groupDao()) {
             return groupDao.getByParams(params);
+        }
+    }
+
+    private void mergeGroup(Group group, Group existingGroup) {
+        group.setId(existingGroup.getId());
+        if (group.getName() == null) {
+            group.setName(existingGroup.getName());
+        }
+        if (group.getDescription() == null) {
+            group.setDescription(existingGroup.getDescription());
         }
     }
 }

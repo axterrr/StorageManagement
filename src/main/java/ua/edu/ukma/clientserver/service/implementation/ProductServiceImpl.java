@@ -48,7 +48,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void update(Product product) {
+    public void update(Integer id, Product product) {
+        mergeProduct(product, getById(id));
         ProductValidator.getInstance().validateForUpdate(product);
         try (ProductDao productDao = daoFactory.productDao()) {
             productDao.update(product);
@@ -57,6 +58,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Integer id) {
+        getById(id);
         try (ProductDao productDao = daoFactory.productDao()) {
             productDao.delete(id);
         }
@@ -96,6 +98,28 @@ public class ProductServiceImpl implements ProductService {
     private void updateAmount(Integer productId, Integer newAmount) {
         try (ProductDao productDao = daoFactory.productDao()) {
             productDao.updateAmount(productId, newAmount);
+        }
+    }
+
+    private void mergeProduct(Product product, Product existingProduct) {
+        product.setId(existingProduct.getId());
+        if (product.getName() == null) {
+            product.setName(existingProduct.getName());
+        }
+        if (product.getDescription() == null) {
+            product.setDescription(existingProduct.getDescription());
+        }
+        if (product.getManufacturer() == null) {
+            product.setManufacturer(existingProduct.getManufacturer());
+        }
+        if (product.getPrice() == null) {
+            product.setPrice(existingProduct.getPrice());
+        }
+        if (product.getAmount() == null) {
+            product.setAmount(existingProduct.getAmount());
+        }
+        if (product.getGroupId() == null) {
+            product.setGroupId(existingProduct.getGroupId());
         }
     }
 }

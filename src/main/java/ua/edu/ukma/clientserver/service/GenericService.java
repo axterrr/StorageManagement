@@ -10,7 +10,7 @@ public interface GenericService<T, K> {
 
 	Integer create(T e);
 
-	void update(T e);
+	void update(K id, T e);
 
 	void delete(K id);
 }
