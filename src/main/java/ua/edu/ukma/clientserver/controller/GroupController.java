@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.controller;
 
 import com.sun.net.httpserver.HttpExchange;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Group;
 import ua.edu.ukma.clientserver.model.GroupSearchParams;
 import ua.edu.ukma.clientserver.service.GroupService;
@@ -28,7 +29,7 @@ public class GroupController extends BaseController {
         } else if (path.matches(GROUP_PATH + "/\\d+")) {
             handleGetGroupById(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -38,7 +39,7 @@ public class GroupController extends BaseController {
         if (path.matches(GROUP_PATH + "/\\d+")) {
             handleDeleteGroup(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -48,7 +49,7 @@ public class GroupController extends BaseController {
         if (path.matches(GROUP_PATH + "/\\d+")) {
             handlePutGroup(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -58,7 +59,7 @@ public class GroupController extends BaseController {
         if (path.matches(GROUP_PATH)) {
             handlePostGroup(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 

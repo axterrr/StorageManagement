@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.controller;
 
 import com.sun.net.httpserver.HttpExchange;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Product;
 import ua.edu.ukma.clientserver.model.ProductSearchParams;
 import ua.edu.ukma.clientserver.service.ProductService;
@@ -30,7 +31,7 @@ public class ProductController extends BaseController {
         } if (path.matches(PRODUCT_PATH + "/group/\\d+")) {
             handleGetProductsByGroupId(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -40,7 +41,7 @@ public class ProductController extends BaseController {
         if (path.matches(PRODUCT_PATH + "/\\d+")) {
             handleDeleteProduct(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -50,7 +51,7 @@ public class ProductController extends BaseController {
         if (path.matches(PRODUCT_PATH + "/\\d+")) {
             handlePutProduct(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 
@@ -64,7 +65,7 @@ public class ProductController extends BaseController {
         } if (path.matches(PRODUCT_PATH + "/\\d+/decrease-amount")) {
             handlePostDecreaseAmount(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 

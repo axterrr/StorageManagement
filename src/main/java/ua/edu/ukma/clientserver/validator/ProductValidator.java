@@ -3,6 +3,7 @@ package ua.edu.ukma.clientserver.validator;
 import ua.edu.ukma.clientserver.dao.DaoFactory;
 import ua.edu.ukma.clientserver.dao.GroupDao;
 import ua.edu.ukma.clientserver.dao.ProductDao;
+import ua.edu.ukma.clientserver.exception.ValidationException;
 import ua.edu.ukma.clientserver.model.Product;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ProductValidator implements BaseValidator<Product> {
         }
 
         if (!errors.isEmpty()) {
-            throw new RuntimeException(errors.toString());
+            throw new ValidationException(errors.toString());
         }
     }
 
@@ -49,7 +50,7 @@ public class ProductValidator implements BaseValidator<Product> {
         }
 
         if (!errors.isEmpty()) {
-            throw new RuntimeException(errors.toString());
+            throw new ValidationException(errors.toString());
         }
     }
 

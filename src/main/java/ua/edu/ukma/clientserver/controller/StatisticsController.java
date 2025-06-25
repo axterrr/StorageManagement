@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.controller;
 
 import com.sun.net.httpserver.HttpExchange;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.service.StatisticsService;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class StatisticsController extends BaseController {
         } else if (path.matches(STATISTICS_PATH + "/total-price/group/\\d+")) {
             handleGetTotalPriceByGroup(exchange);
         } else {
-            exchange.sendResponseHeaders(404, -1);
+            throw new NotFoundException();
         }
     }
 

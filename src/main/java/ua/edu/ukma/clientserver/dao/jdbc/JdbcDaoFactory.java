@@ -2,6 +2,7 @@ package ua.edu.ukma.clientserver.dao.jdbc;
 
 import org.postgresql.ds.PGSimpleDataSource;
 import ua.edu.ukma.clientserver.dao.DaoFactory;
+import ua.edu.ukma.clientserver.exception.ServerException;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
@@ -27,7 +28,7 @@ public class JdbcDaoFactory extends DaoFactory {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error during reading property file");
+            throw new ServerException("Error during reading property file");
         }
 
         dataSourceConfig.setUrl(props.getProperty("database.url"));
@@ -42,7 +43,7 @@ public class JdbcDaoFactory extends DaoFactory {
         try {
             return new JdbcProductDao(dataSource.getConnection());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -51,7 +52,7 @@ public class JdbcDaoFactory extends DaoFactory {
         try {
             return new JdbcGroupDao(dataSource.getConnection());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 }

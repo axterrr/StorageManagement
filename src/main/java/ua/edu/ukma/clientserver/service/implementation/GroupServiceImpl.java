@@ -2,6 +2,7 @@ package ua.edu.ukma.clientserver.service.implementation;
 
 import ua.edu.ukma.clientserver.dao.DaoFactory;
 import ua.edu.ukma.clientserver.dao.GroupDao;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Group;
 import ua.edu.ukma.clientserver.model.GroupSearchParams;
 import ua.edu.ukma.clientserver.service.GroupService;
@@ -35,7 +36,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group getById(Integer id) {
         try (GroupDao groupDao = daoFactory.groupDao()) {
-            return groupDao.getById(id).orElseThrow(() -> new RuntimeException("Group not found"));
+            return groupDao.getById(id).orElseThrow(() -> new NotFoundException("Group not found"));
         }
     }
 

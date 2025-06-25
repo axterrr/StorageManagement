@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.dao.jdbc;
 
 import ua.edu.ukma.clientserver.dao.ProductDao;
+import ua.edu.ukma.clientserver.exception.ServerException;
 import ua.edu.ukma.clientserver.model.Product;
 import ua.edu.ukma.clientserver.model.ProductSearchParams;
 
@@ -50,7 +51,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             keys.next();
             return keys.getInt(1);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -69,7 +70,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setInt(5, product.getId());
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -81,7 +82,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setInt(1, id);
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -92,7 +93,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
         try (PreparedStatement query = connection.prepareStatement(sql)) {
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -108,7 +109,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
                 product = extractProductFromResultSet(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return Optional.ofNullable(product);
@@ -131,7 +132,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
                 product = extractProductFromResultSet(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return Optional.ofNullable(product);
@@ -154,7 +155,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
                 products.add(extractProductFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return products;
@@ -172,7 +173,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
             query.setInt(2, id);
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -188,7 +189,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
                 products.add(extractProductFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return products;
@@ -260,7 +261,7 @@ public class JdbcProductDao implements ProductDao, AutoCloseable {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 }

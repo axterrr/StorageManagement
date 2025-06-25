@@ -1,6 +1,7 @@
 package ua.edu.ukma.clientserver.dao.jdbc;
 
 import ua.edu.ukma.clientserver.dao.GroupDao;
+import ua.edu.ukma.clientserver.exception.ServerException;
 import ua.edu.ukma.clientserver.model.Group;
 import ua.edu.ukma.clientserver.model.GroupSearchParams;
 
@@ -30,8 +31,8 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
     @Override
     public Integer create(Group group) {
         String sql = String.format(
-            "INSERT INTO %s (%s, %s) VALUES (?, ?)",
-            TABLE_NAME, NAME, DESCRIPTION
+                "INSERT INTO %s (%s, %s) VALUES (?, ?)",
+                TABLE_NAME, NAME, DESCRIPTION
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -43,15 +44,15 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
             keys.next();
             return keys.getInt(1);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
     @Override
     public void update(Group group) {
         String sql = String.format(
-            "UPDATE %s SET %s = ?, %s = ? WHERE %s = ?",
-            TABLE_NAME, NAME, DESCRIPTION, ID
+                "UPDATE %s SET %s = ?, %s = ? WHERE %s = ?",
+                TABLE_NAME, NAME, DESCRIPTION, ID
         );
 
         try (PreparedStatement query = connection.prepareStatement(sql)) {
@@ -60,7 +61,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
             query.setInt(3, group.getId());
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -72,7 +73,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
             query.setInt(1, id);
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -83,7 +84,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
         try (PreparedStatement query = connection.prepareStatement(sql)) {
             query.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 
@@ -99,7 +100,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
                 group = extractGroupFromResultSet(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return Optional.ofNullable(group);
@@ -122,7 +123,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
                 group = extractGroupFromResultSet(resultSet);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return Optional.ofNullable(group);
@@ -145,7 +146,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
                 groups.add(extractGroupFromResultSet(resultSet));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
 
         return groups;
@@ -172,10 +173,10 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
 
     private static Group extractGroupFromResultSet(ResultSet resultSet) throws SQLException {
         return Group.builder()
-            .id(resultSet.getInt(ID))
-            .name(resultSet.getString(NAME))
-            .description(resultSet.getString(DESCRIPTION))
-            .build();
+                .id(resultSet.getInt(ID))
+                .name(resultSet.getString(NAME))
+                .description(resultSet.getString(DESCRIPTION))
+                .build();
     }
 
     @Override
@@ -183,7 +184,7 @@ public class JdbcGroupDao implements GroupDao, AutoCloseable {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServerException();
         }
     }
 }

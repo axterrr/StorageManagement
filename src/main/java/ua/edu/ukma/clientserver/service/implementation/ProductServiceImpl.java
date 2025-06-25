@@ -2,6 +2,8 @@ package ua.edu.ukma.clientserver.service.implementation;
 
 import ua.edu.ukma.clientserver.dao.DaoFactory;
 import ua.edu.ukma.clientserver.dao.ProductDao;
+import ua.edu.ukma.clientserver.exception.ConflictException;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Product;
 import ua.edu.ukma.clientserver.model.ProductSearchParams;
 import ua.edu.ukma.clientserver.service.ProductService;
@@ -35,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getById(Integer id) {
         try (ProductDao productDao = daoFactory.productDao()) {
-            return productDao.getById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+            return productDao.getById(id).orElseThrow(() -> new NotFoundException("Product not found"));
         }
     }
 
@@ -90,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(productId);
         int newAmount = product.getAmount() - amount;
         if (newAmount < 0) {
-            throw new RuntimeException("Not enough products in stock");
+            throw new ConflictException("Not enough products in stock");
         }
         updateAmount(productId, newAmount);
     }
