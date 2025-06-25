@@ -1,13 +1,26 @@
 package ua.edu.ukma.clientserver;
 
-import ua.edu.ukma.clientserver.model.Group;
-import ua.edu.ukma.clientserver.model.Product;
+import com.sun.net.httpserver.HttpServer;
+import ua.edu.ukma.clientserver.controller.GroupController;
+import ua.edu.ukma.clientserver.controller.ProductController;
 import ua.edu.ukma.clientserver.service.implementation.GroupServiceImpl;
 import ua.edu.ukma.clientserver.service.implementation.ProductServiceImpl;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
 public class Main {
-    public static void main(String[] args) {
-        int id = GroupServiceImpl.getInstance().create(Group.builder().name("test").build());
-        ProductServiceImpl.getInstance().create(Product.builder().name("test").price(20.0).groupId(id).build());
+    public static void main(String[] args) throws IOException {
+        int port = 8080;
+
+        InetSocketAddress address = new InetSocketAddress(port);
+        ProductController productController = new ProductController(ProductServiceImpl.getInstance());
+        GroupController groupController = new GroupController(GroupServiceImpl.getInstance());
+
+        HttpServer server = HttpServer.create(address, 0);
+        server.createContext(ProductController.PRODUCT_PATH, productController);
+        server.createContext(GroupController.GROUP_PATH, groupController);
+
+        server.start();
     }
 }
