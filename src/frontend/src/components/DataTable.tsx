@@ -3,9 +3,7 @@ import React from 'react'
 import { Table } from 'react-bootstrap'
 
 export interface Column {
-    /** Заголовок колонки, відображається у шапці */
     header: string
-    /** Ключ у рядках даних */
     accessor: string
 }
 

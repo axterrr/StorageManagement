@@ -36,7 +36,7 @@ const App: React.FC = () => {
             { header: 'Опис', accessor: 'description' },
         ]
 
-    const rows: any[] = [] // замінити на дані з API
+    const rows: any[] = []
 
     return (
         <div className="app-container">
