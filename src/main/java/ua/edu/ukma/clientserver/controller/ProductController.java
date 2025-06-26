@@ -5,11 +5,14 @@ import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Product;
 import ua.edu.ukma.clientserver.model.ProductSearchParams;
 import ua.edu.ukma.clientserver.service.ProductService;
-import ua.edu.ukma.clientserver.utils.QueryUtils;
+import ua.edu.ukma.clientserver.utils.ControllerUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.readRequestBody;
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendNoContentResponse;
 
 public class ProductController extends BaseController {
 
@@ -71,66 +74,54 @@ public class ProductController extends BaseController {
 
     private void handlePutProduct(HttpExchange exchange) throws IOException {
         Integer productId = getProductId(exchange.getRequestURI().getPath());
-        Product product = objectMapper.readValue(exchange.getRequestBody(), Product.class);
+        Product product = readRequestBody(exchange, Product.class);
         productService.update(productId, product);
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private void handlePostProduct(HttpExchange exchange) throws IOException {
-        Product product = objectMapper.readValue(exchange.getRequestBody(), Product.class);
+        Product product = readRequestBody(exchange, Product.class);
         int id = productService.create(product);
-        String response = "{\"id\":" + id + "}";
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(201, responseBytes.length);
-        exchange.getResponseBody().write(responseBytes);
+        String response = String.format("{\"id\":%s}", id);
+        sendJSONResponse(exchange, 201, response);
     }
 
     private void handleDeleteProduct(HttpExchange exchange) throws IOException {
         Integer productId = getProductId(exchange.getRequestURI().getPath());
         productService.delete(productId);
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private void handleGetProductById(HttpExchange exchange) throws IOException {
         Integer productId = getProductId(exchange.getRequestURI().getPath());
         Product product = productService.getById(productId);
-        byte[] response = objectMapper.writeValueAsBytes(product);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, response.length);
-        exchange.getResponseBody().write(response);
+        sendJSONResponse(exchange, 200, product);
     }
 
     private void handleGetSearchProducts(HttpExchange exchange) throws IOException {
-        ProductSearchParams params = QueryUtils.productSearchParams(exchange.getRequestURI().getQuery());
-        List<Product> groups = productService.search(params);
-        byte[] response = objectMapper.writeValueAsBytes(groups);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, response.length);
-        exchange.getResponseBody().write(response);
+        ProductSearchParams params = ControllerUtils.productSearchParams(exchange.getRequestURI().getQuery());
+        List<Product> products = productService.search(params);
+        sendJSONResponse(exchange, 200, products);
     }
 
     private void handleGetProductsByGroupId(HttpExchange exchange) throws IOException {
         Integer groupId = getGroupId(exchange.getRequestURI().getPath());
-        List<Product> groups = productService.getByGroup(groupId);
-        byte[] response = objectMapper.writeValueAsBytes(groups);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, response.length);
-        exchange.getResponseBody().write(response);
+        List<Product> products = productService.getByGroup(groupId);
+        sendJSONResponse(exchange, 200, products);
     }
 
     private void handlePostDecreaseAmount(HttpExchange exchange) throws IOException {
-        Product productWithAmount = objectMapper.readValue(exchange.getRequestBody(), Product.class);
+        Product productWithAmount = readRequestBody(exchange, Product.class);
         Integer productId = getProductId(exchange.getRequestURI().getPath());
         productService.decreaseAmount(productId, productWithAmount.getAmount());
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private void handlePostIncreaseAmount(HttpExchange exchange) throws IOException {
-        Product productWithAmount = objectMapper.readValue(exchange.getRequestBody(), Product.class);
+        Product productWithAmount = readRequestBody(exchange, Product.class);
         Integer productId = getProductId(exchange.getRequestURI().getPath());
         productService.increaseAmount(productId, productWithAmount.getAmount());
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private Integer getProductId(String path) {

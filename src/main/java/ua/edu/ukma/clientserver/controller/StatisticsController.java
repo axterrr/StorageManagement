@@ -5,7 +5,8 @@ import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.service.StatisticsService;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
 
 public class StatisticsController extends BaseController {
 
@@ -33,19 +34,13 @@ public class StatisticsController extends BaseController {
         String path = exchange.getRequestURI().getPath();
         Integer groupId = Integer.parseInt(path.substring(path.lastIndexOf('/') + 1));
         Double totalPrice = productService.getTotalProductsPriceInGroup(groupId);
-        String response = "{\"id:\":" + groupId + ",\"totalPrice\":" + totalPrice + "}";
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, responseBytes.length);
-        exchange.getResponseBody().write(responseBytes);
+        String response = String.format("{\"id:\":%s,\"totalPrice\":%s}", groupId, totalPrice);
+        sendJSONResponse(exchange, 200, response);
     }
 
     private void handleGetTotalPrice(HttpExchange exchange) throws IOException {
         Double totalPrice = productService.getTotalProductsPriceInStorage();
-        String response = "{\"totalPrice\":" + totalPrice + "}";
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, responseBytes.length);
-        exchange.getResponseBody().write(responseBytes);
+        String response = String.format("{\"totalPrice\":%s}", totalPrice);
+        sendJSONResponse(exchange, 200, response);
     }
 }
