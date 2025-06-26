@@ -1,0 +1,18 @@
+/* глобальный сброс и светлая тема */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #f8f9fa;      /* светлый фон */
+  color: #212529;           /* тёмно-серый текст */
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* сброс встроенных отступов у списков, полей и т.п. */
+* {
+  box-sizing: border-box;
+}
