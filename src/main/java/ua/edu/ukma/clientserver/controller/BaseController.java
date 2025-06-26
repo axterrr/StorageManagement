@@ -5,9 +5,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ua.edu.ukma.clientserver.exception.BaseException;
 import ua.edu.ukma.clientserver.exception.NotSupportedMethodException;
-import ua.edu.ukma.clientserver.model.ErrorResponse;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class BaseController implements HttpHandler {
 
@@ -49,10 +49,10 @@ public class BaseController implements HttpHandler {
     }
 
     private void sendErrorResponse(HttpExchange exchange, int code, String message) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(code, message);
-        byte[] response = objectMapper.writeValueAsBytes(errorResponse);
+        String response = "{\"code\":" + code + ", \"message\":\"" + message + "\"}";
+        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(errorResponse.getCode(), response.length);
-        exchange.getResponseBody().write(response);
+        exchange.sendResponseHeaders(code, responseBytes.length);
+        exchange.getResponseBody().write(responseBytes);
     }
 }
