@@ -1,7 +1,9 @@
 package ua.edu.ukma.clientserver.service.implementation;
 
 import ua.edu.ukma.clientserver.dao.DaoFactory;
+import ua.edu.ukma.clientserver.dao.GroupDao;
 import ua.edu.ukma.clientserver.dao.ProductDao;
+import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Product;
 import ua.edu.ukma.clientserver.service.StatisticsService;
 
@@ -36,6 +38,12 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Double getTotalProductsPriceInGroup(Integer groupId) {
+        try (GroupDao groupDao = daoFactory.groupDao()) {
+            if (groupDao.getById(groupId).isEmpty()) {
+                throw new NotFoundException("Group not found");
+            }
+        }
+
         List<Product> products;
         try (ProductDao productDao = daoFactory.productDao()) {
             products = productDao.getByGroup(groupId);
