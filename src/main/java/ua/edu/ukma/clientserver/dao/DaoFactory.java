@@ -16,4 +16,6 @@ public abstract class DaoFactory {
     public abstract ProductDao productDao();
 
     public abstract GroupDao groupDao();
+
+    public abstract CredentialsDao credentialsDao();
 }
