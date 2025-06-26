@@ -34,4 +34,8 @@ public class AppConfig {
     public static long getLong(String key) {
         return Long.parseLong(get(key));
     }
+
+    public static int getInt(String key) {
+        return Integer.parseInt(get(key));
+    }
 }
