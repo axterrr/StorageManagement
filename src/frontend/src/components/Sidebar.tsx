@@ -1,15 +1,14 @@
-// src/components/Sidebar.tsx
-import React from 'react'
-import { Button, Form } from 'react-bootstrap'
+import React from 'react';
+import { Button, Form } from 'react-bootstrap';
 
 interface SidebarProps {
-    mode: 'product' | 'group'
-    onToggle: () => void
-    onAdd: () => void
-    onDelete: () => void
-    onStockIn: () => void
-    onStockOut: () => void
-    onStats: () => void
+    mode: 'product' | 'group';
+    onToggle: () => void;
+    onAdd: () => void;
+    onDelete: () => void;
+    onStockIn: () => void;
+    onStockOut: () => void;
+    onStats: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -19,59 +18,46 @@ const Sidebar: React.FC<SidebarProps> = ({
                                              onDelete,
                                              onStockIn,
                                              onStockOut,
-                                             onStats,
+                                             onStats
                                          }) => (
-    <div className="d-flex flex-column h-100 p-3">
-        {/* Toggle */}
-        <div className="mb-3 w-100 text-center">
-            <Form.Check
-                type="switch"
-                id="toggle-mode"
-                className="mx-auto"
-                onChange={onToggle}
-            />
-            <Form.Label className="mt-1">
-                {mode === 'product'
-                    ? 'Показати: Товари ⇄ Групи'
-                    : 'Показати: Групи ⇄ Товари'}
-            </Form.Label>
-        </div>
-
-        <hr className="w-100" />
-
-        {/* CRUD Buttons */}
-        <Button onClick={onAdd} className="mb-2 w-100">
+    <div className="d-flex flex-column h-100">
+        <Form.Check
+            type="switch"
+            id="toggle-mode"
+            label={
+                mode === 'product'
+                    ? 'Показати: Товари ↔ Групи'
+                    : 'Показати: Групи ↔ Товари'
+            }
+            onChange={onToggle}
+            className="mb-3"
+        />
+        <Button onClick={onAdd} className="mb-2">
             Додати
         </Button>
-        <Button onClick={onDelete} className="mb-2 w-100">
+        <Button onClick={onDelete} className="mb-2">
             Видалити
         </Button>
-
         <div className="mt-auto">
-            {/* Stock operations */}
             <Button
                 variant="outline-primary"
                 onClick={onStockIn}
-                className="mb-2 w-100"
+                className="mb-2"
             >
                 Прийом на склад
             </Button>
             <Button
                 variant="outline-secondary"
                 onClick={onStockOut}
-                className="mb-2 w-100"
+                className="mb-2"
             >
                 Списання зі складу
             </Button>
-
-            <hr className="w-100 mt-3" />
-
-            {/* Statistics */}
-            <Button variant="outline-success" onClick={onStats} className="w-100">
+            <Button variant="outline-success" onClick={onStats}>
                 Статистика
             </Button>
         </div>
     </div>
-)
+);
 
-export default Sidebar
+export default Sidebar;

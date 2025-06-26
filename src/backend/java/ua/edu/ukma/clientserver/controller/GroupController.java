@@ -5,11 +5,14 @@ import ua.edu.ukma.clientserver.exception.NotFoundException;
 import ua.edu.ukma.clientserver.model.Group;
 import ua.edu.ukma.clientserver.model.GroupSearchParams;
 import ua.edu.ukma.clientserver.service.GroupService;
-import ua.edu.ukma.clientserver.utils.QueryUtils;
+import ua.edu.ukma.clientserver.utils.ControllerUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendNoContentResponse;
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.readRequestBody;
 
 public class GroupController extends BaseController {
 
@@ -65,43 +68,34 @@ public class GroupController extends BaseController {
 
     private void handlePutGroup(HttpExchange exchange) throws IOException {
         Integer groupId = getGroupId(exchange.getRequestURI().getPath());
-        Group group = objectMapper.readValue(exchange.getRequestBody(), Group.class);
+        Group group = readRequestBody(exchange, Group.class);
         groupService.update(groupId, group);
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private void handlePostGroup(HttpExchange exchange) throws IOException {
-        Group group = objectMapper.readValue(exchange.getRequestBody(), Group.class);
+        Group group = readRequestBody(exchange, Group.class);
         int id = groupService.create(group);
-        String response = "{\"id\":" + id + "}";
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(201, responseBytes.length);
-        exchange.getResponseBody().write(responseBytes);
+        String response = String.format("{\"id\":%s}", id);
+        sendJSONResponse(exchange, 201, response);
     }
 
     private void handleDeleteGroup(HttpExchange exchange) throws IOException {
         Integer groupId = getGroupId(exchange.getRequestURI().getPath());
         groupService.delete(groupId);
-        exchange.sendResponseHeaders(204, -1);
+        sendNoContentResponse(exchange);
     }
 
     private void handleGetGroupById(HttpExchange exchange) throws IOException {
         Integer groupId = getGroupId(exchange.getRequestURI().getPath());
         Group group = groupService.getById(groupId);
-        byte[] response = objectMapper.writeValueAsBytes(group);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, response.length);
-        exchange.getResponseBody().write(response);
+        sendJSONResponse(exchange, 200, group);
     }
 
     private void handleGetSearchGroups(HttpExchange exchange) throws IOException {
-        GroupSearchParams params = QueryUtils.groupSearchParams(exchange.getRequestURI().getQuery());
+        GroupSearchParams params = ControllerUtils.groupSearchParams(exchange.getRequestURI().getQuery());
         List<Group> groups = groupService.search(params);
-        byte[] response = objectMapper.writeValueAsBytes(groups);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, response.length);
-        exchange.getResponseBody().write(response);
+        sendJSONResponse(exchange, 200, groups);
     }
 
     private Integer getGroupId(String path) {

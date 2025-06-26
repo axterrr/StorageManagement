@@ -6,7 +6,9 @@ import ua.edu.ukma.clientserver.model.Credentials;
 import ua.edu.ukma.clientserver.service.AuthService;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.readRequestBody;
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
 
 public class AuthController extends BaseController {
 
@@ -29,12 +31,9 @@ public class AuthController extends BaseController {
     }
 
     private void handlePostLogin(HttpExchange exchange) throws IOException {
-        Credentials credentials = objectMapper.readValue(exchange.getRequestBody(), Credentials.class);
+        Credentials credentials = readRequestBody(exchange, Credentials.class);
         String token = authService.authenticate(credentials.getUsername(), credentials.getPassword());
-        String response = "{\"type\":\"Bearer\",\"token\":\"" + token + "\"}";
-        byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, responseBytes.length);
-        exchange.getResponseBody().write(responseBytes);
+        String response = String.format("{\"type\":\"Bearer\",\"token\":\"%s\"}", token);
+        sendJSONResponse(exchange, 200, response);
     }
 }

@@ -1,17 +1,15 @@
 package ua.edu.ukma.clientserver.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ua.edu.ukma.clientserver.exception.BaseException;
 import ua.edu.ukma.clientserver.exception.NotSupportedMethodException;
-import ua.edu.ukma.clientserver.model.ErrorResponse;
 
 import java.io.IOException;
 
-public class BaseController implements HttpHandler {
+import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
 
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+public class BaseController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -49,10 +47,7 @@ public class BaseController implements HttpHandler {
     }
 
     private void sendErrorResponse(HttpExchange exchange, int code, String message) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(code, message);
-        byte[] response = objectMapper.writeValueAsBytes(errorResponse);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.sendResponseHeaders(errorResponse.getCode(), response.length);
-        exchange.getResponseBody().write(response);
+        String response = String.format("{\"code\":%s, \"message\":\"%s\"}", code, message);
+        sendJSONResponse(exchange, code, response);
     }
 }
