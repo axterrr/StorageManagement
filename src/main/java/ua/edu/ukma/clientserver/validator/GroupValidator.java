@@ -12,7 +12,7 @@ public class GroupValidator implements BaseValidator<Group> {
 
     private final DaoFactory daoFactory;
 
-    private GroupValidator(DaoFactory daoFactory) {
+    public GroupValidator(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 

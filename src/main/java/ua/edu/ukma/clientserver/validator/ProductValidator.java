@@ -13,7 +13,7 @@ public class ProductValidator implements BaseValidator<Product> {
 
     private final DaoFactory daoFactory;
 
-    private ProductValidator(DaoFactory daoFactory) {
+    public ProductValidator(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 
