@@ -1,26 +1,64 @@
-// src/components/SearchBar.tsx
 import React from 'react'
-import { Form, InputGroup, Button } from 'react-bootstrap'
+import { InputGroup, FormControl, Dropdown, Button } from 'react-bootstrap'
+
+export interface Column {
+    header: string
+    accessor: string
+}
 
 export interface SearchBarProps {
     value: string
-    onChange: (value: string) => void
-    onClear?: () => void
+    onChange: (v: string) => void
+    onClear: () => void
+
+    columns: Column[]
+    selected?: string
+    onSelectColumn: (accessor?: string) => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onClear }) => (
-    <InputGroup className="mb-2">
-        <Form.Control
-            placeholder="Пошук..."
-            value={value}
-            onChange={e => onChange(e.target.value)}
-        />
-        {onClear && value && (
+export default function SearchBar({
+                                      value,
+                                      onChange,
+                                      onClear,
+                                      columns,
+                                      selected,
+                                      onSelectColumn,
+                                  }: SearchBarProps) {
+    return (
+        <InputGroup className="mb-3">
+            <FormControl
+                placeholder="Пошук…"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+            />
             <Button variant="outline-secondary" onClick={onClear}>
-                Очистити
+                ✕
             </Button>
-        )}
-    </InputGroup>
-)
 
-export default SearchBar
+            <Dropdown align="end">
+                <Dropdown.Toggle variant="outline-primary">
+                    {selected
+                        ? columns.find(c => c.accessor === selected)?.header
+                        : 'Фільтри'}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <Dropdown.Item
+                        active={!selected}
+                        onClick={() => onSelectColumn(undefined)}
+                    >
+                        Усі поля
+                    </Dropdown.Item>
+                    {columns.map(col => (
+                        <Dropdown.Item
+                            key={col.accessor}
+                            active={col.accessor === selected}
+                            onClick={() => onSelectColumn(col.accessor)}
+                        >
+                            {col.header}
+                        </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+            </Dropdown>
+        </InputGroup>
+    )
+}

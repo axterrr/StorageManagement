@@ -1,39 +1,48 @@
 // src/components/StockModal.tsx
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form } from 'react-bootstrap'
 
 export interface StockItem {
-    id: any
-    label: string
+    id: number
+    name: string
+    // любые другие поля, которые вам нужны
 }
 
 export interface StockModalProps {
     show: boolean
     title: string
     items: StockItem[]
-    selectedId?: any
-    onConfirm: (id: any, amount: number) => void
+    /**
+     * Вызывается при подтверждении.
+     * Первый аргумент — выбранный item,
+     * второй — введённая quantity.
+     */
+    onConfirm: (item: StockItem, quantity: number) => void
     onCancel: () => void
-    confirmLabel?: string
-    cancelLabel?: string
 }
 
 const StockModal: React.FC<StockModalProps> = ({
                                                    show,
                                                    title,
                                                    items,
-                                                   selectedId,
                                                    onConfirm,
                                                    onCancel,
-                                                   confirmLabel = 'ОК',
-                                                   cancelLabel = 'Відміна',
                                                }) => {
-    const [currentId, setCurrentId] = useState<any>(selectedId ?? '')
-    const [amount, setAmount] = useState<number>(0)
+    const [selectedId, setSelectedId] = useState<number>(items[0]?.id ?? 0)
+    const [quantity, setQuantity]   = useState<number>(0)
 
-    const handleConfirm = () => {
-        onConfirm(currentId, amount)
-        setAmount(0)
+    // Если список items меняется, по умолчанию выбираем первый
+    useEffect(() => {
+        if (items.length > 0) {
+            setSelectedId(items[0].id)
+        }
+    }, [items])
+
+    const handleOk = () => {
+        const item = items.find(i => i.id === selectedId)
+        if (item) {
+            onConfirm(item, quantity)
+        }
     }
 
     return (
@@ -42,37 +51,34 @@ const StockModal: React.FC<StockModalProps> = ({
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form>
-                    <Form.Group className="mb-2">
-                        <Form.Label>Виберіть</Form.Label>
-                        <Form.Select
-                            value={currentId}
-                            onChange={(e) => setCurrentId(e.target.value)}
-                        >
-                            <option value="">—</option>
-                            {items.map((it) => (
-                                <option key={it.id} value={it.id}>
-                                    {it.label}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    <Form.Group className="mb-2">
-                        <Form.Label>Кількість</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                        />
-                    </Form.Group>
-                </Form>
+                <Form.Group className="mb-3">
+                    <Form.Label>Виберіть</Form.Label>
+                    <Form.Select
+                        value={selectedId}
+                        onChange={e => setSelectedId(Number(e.target.value))}
+                    >
+                        {items.map(i => (
+                            <option key={i.id} value={i.id}>
+                                {i.name}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Кількість</Form.Label>
+                    <Form.Control
+                        type="number"
+                        value={quantity}
+                        onChange={e => setQuantity(Number(e.target.value))}
+                    />
+                </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="primary" onClick={handleConfirm} disabled={!currentId}>
-                    {confirmLabel}
-                </Button>
                 <Button variant="secondary" onClick={onCancel}>
-                    {cancelLabel}
+                    Відміна
+                </Button>
+                <Button variant="primary" onClick={handleOk}>
+                    OK
                 </Button>
             </Modal.Footer>
         </Modal>
