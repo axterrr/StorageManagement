@@ -20,7 +20,7 @@ public class TestUtils {
 
     public static Group randomGroup() {
         return Group.builder()
-                .id(random.nextInt())
+                .id(random.nextInt(100))
                 .name(randomString(10))
                 .description(randomString(10))
                 .build();
@@ -28,12 +28,12 @@ public class TestUtils {
 
     public static Product randomProduct(int groupId) {
         return Product.builder()
-                .id(random.nextInt())
+                .id(random.nextInt(100))
                 .name(randomString(10))
                 .description(randomString(10))
                 .manufacturer(randomString(10))
-                .amount(random.nextInt())
-                .price(random.nextDouble())
+                .price(random.nextDouble(1000))
+                .amount(random.nextInt(1000))
                 .groupId(groupId)
                 .build();
     }

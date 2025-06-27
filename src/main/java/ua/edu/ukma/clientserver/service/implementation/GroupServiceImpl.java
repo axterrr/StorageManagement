@@ -13,17 +13,11 @@ import java.util.List;
 public class GroupServiceImpl implements GroupService {
 
     private final DaoFactory daoFactory;
+    private final GroupValidator validator;
 
-    private GroupServiceImpl(DaoFactory daoFactory) {
+    public GroupServiceImpl(DaoFactory daoFactory, GroupValidator validator) {
         this.daoFactory = daoFactory;
-    }
-
-    private static class Holder {
-        static final GroupService INSTANCE = new GroupServiceImpl(DaoFactory.getDaoFactory());
-    }
-
-    public static GroupService getInstance() {
-        return Holder.INSTANCE;
+        this.validator = validator;
     }
 
     @Override
@@ -42,7 +36,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Integer create(Group group) {
-        GroupValidator.getInstance().validateForCreate(group);
+        validator.validateForCreate(group);
         try (GroupDao groupDao = daoFactory.groupDao()) {
             return groupDao.create(group);
         }
@@ -51,7 +45,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void update(Integer id, Group group) {
         mergeGroup(group, getById(id));
-        GroupValidator.getInstance().validateForUpdate(group);
+        validator.validateForUpdate(group);
         try (GroupDao groupDao = daoFactory.groupDao()) {
             groupDao.update(group);
         }

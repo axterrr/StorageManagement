@@ -16,18 +16,10 @@ public class AuthServiceImpl implements AuthService {
     private final JWTUtility jwtUtility;
     private final PasswordHasher passwordHasher;
 
-    private AuthServiceImpl(DaoFactory daoFactory, JWTUtility jwtUtility, PasswordHasher passwordHasher) {
+    public AuthServiceImpl(DaoFactory daoFactory, JWTUtility jwtUtility, PasswordHasher passwordHasher) {
         this.daoFactory = daoFactory;
         this.jwtUtility = jwtUtility;
         this.passwordHasher = passwordHasher;
-    }
-
-    private static class Holder {
-        static final AuthService INSTANCE = new AuthServiceImpl(DaoFactory.getDaoFactory(), JWTUtility.getInstance(), PasswordHasher.getInstance());
-    }
-
-    public static AuthService getInstance() {
-        return AuthServiceImpl.Holder.INSTANCE;
     }
 
     @Override

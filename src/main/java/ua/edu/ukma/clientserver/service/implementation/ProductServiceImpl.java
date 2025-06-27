@@ -14,17 +14,11 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final DaoFactory daoFactory;
+    private final ProductValidator validator;
 
-    private ProductServiceImpl(DaoFactory daoFactory) {
+    public ProductServiceImpl(DaoFactory daoFactory, ProductValidator validator) {
         this.daoFactory = daoFactory;
-    }
-
-    private static class Holder {
-        static final ProductService INSTANCE = new ProductServiceImpl(DaoFactory.getDaoFactory());
-    }
-
-    public static ProductService getInstance() {
-        return Holder.INSTANCE;
+        this.validator = validator;
     }
 
     @Override
@@ -43,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Integer create(Product product) {
-        ProductValidator.getInstance().validateForCreate(product);
+        validator.validateForCreate(product);
         try (ProductDao productDao = daoFactory.productDao()) {
             return productDao.create(product);
         }
@@ -52,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void update(Integer id, Product product) {
         mergeProduct(product, getById(id));
-        ProductValidator.getInstance().validateForUpdate(product);
+        validator.validateForUpdate(product);
         try (ProductDao productDao = daoFactory.productDao()) {
             productDao.update(product);
         }
