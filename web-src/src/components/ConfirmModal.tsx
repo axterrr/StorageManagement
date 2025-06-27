@@ -4,7 +4,7 @@ import { Modal, Button } from 'react-bootstrap'
 export interface ConfirmModalProps {
     show: boolean
     message: string
-    onConfirm: () => void
+    onConfirm: () => void      // ← больше не передаем data
     onCancel: () => void
     confirmLabel?: string
     cancelLabel?: string
@@ -24,7 +24,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </Modal.Header>
         <Modal.Body>{message}</Modal.Body>
         <Modal.Footer>
-            <Button variant="danger" onClick={onConfirm}>
+            <Button variant="primary" onClick={onConfirm}>
                 {confirmLabel}
             </Button>
             <Button variant="secondary" onClick={onCancel}>

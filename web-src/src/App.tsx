@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useState, useEffect } from 'react'
 import api from './services/api.js'
 import { login as doLogin } from './services/auth.js'
@@ -18,6 +19,7 @@ type Mode = 'product' | 'group'
 type SortConfig = { accessor: string; direction: 'asc' | 'desc' }
 
 const App: React.FC = () => {
+    // --- Auth & token header ---
     const [token, setToken] = useState<string | null>(null)
     const isAuthed = token !== null
     useEffect(() => {
@@ -25,8 +27,10 @@ const App: React.FC = () => {
         else delete api.defaults.headers.common['Authorization']
     }, [token])
 
+    // --- UI state ---
     const [mode, setMode] = useState<Mode>('product')
     const [search, setSearch] = useState<string>('')
+    const [filterColumn, setFilterColumn] = useState<string | undefined>(undefined)
     const [logs, setLogs] = useState<string[]>([])
     const [showAdd, setShowAdd] = useState<boolean>(false)
     const [showDelete, setShowDelete] = useState<boolean>(false)
@@ -35,21 +39,48 @@ const App: React.FC = () => {
     const [selected, setSelected] = useState<any | null>(null)
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
 
+    interface Log {
+        name: string
+        amount: number
+        price: number
+    }
+
+    const addLog = (log: Log) => {
+        setLogs(l => [
+            ...l,
+            `Log: ${log.name}, amount=${log.amount}, price=${log.price}`
+        ])
+        const path = mode === 'product'
+            ? '/api/product_logs'
+            : '/api/product_group_logs'
+        api.post(path, log).catch(err =>
+            setLogs(l => [...l, `Error writing log: ${err.message}`])
+        )
+    }
+
+
+    // --- Load data on auth or mode change ---
     useEffect(() => {
         if (!isAuthed) return
         setSortConfig(null)
+        setFilterColumn(undefined)
         const endpoint = mode === 'product' ? '/product' : '/group'
-        api.get(endpoint)
+        api
+            .get(endpoint)
             .then(res => setRows(res.data))
             .catch(err => setLogs(l => [...l, `Error loading ${endpoint}: ${err.message}`]))
     }, [mode, isAuthed])
 
-    const handleSort = (col: { accessor: string | ((r:any)=>any) }) => {
+    // --- Sorting handler ---
+    const handleSort = (col: { accessor: string | ((row: any) => any) }) => {
         if (typeof col.accessor !== 'string') return
         const key = col.accessor
         let direction: 'asc' | 'desc' = 'asc'
-        if (sortConfig?.accessor === key && sortConfig.direction === 'asc') direction = 'desc'
+        if (sortConfig?.accessor === key && sortConfig.direction === 'asc') {
+            direction = 'desc'
+        }
         setSortConfig({ accessor: key, direction })
+
         const sorted = [...rows].sort((a, b) => {
             const va = a[key], vb = b[key]
             if (va == null) return 1
@@ -61,41 +92,79 @@ const App: React.FC = () => {
         setRows(sorted)
     }
 
+    // --- Action handlers ---
     const handleAdd = (data: any) => {
         const endpoint = mode === 'product' ? '/product' : '/group'
         api.post(endpoint, data)
             .then(res => {
-                const newRow = mode === 'product' ? res.data : { id: res.data.id, ...data }
+                const newRow = mode === 'product'
+                    ? res.data
+                    : { id: res.data.id, ...data }
                 setRows(r => [...r, newRow])
-                setLogs(l => [...l, `${mode} created: ${res.data.id}`])
+                addLog({
+                    name: newRow.name,
+                    amount: newRow.amount,
+                    price: newRow.price,
+                })
             })
-            .catch(err => setLogs(l => [...l, `Error creating ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: data.name,
+                    amount: data.amount || 0,
+                    price: data.price || 0,
+                })
+            )
             .finally(() => setShowAdd(false))
     }
 
     const handleDelete = () => {
-        if (!selected) return setShowDelete(false)
+        if (!selected) { setShowDelete(false); return }
         const endpoint = mode === 'product' ? '/product' : '/group'
+
+        addLog({
+            name: selected.name,
+            amount: selected.amount,
+            price: selected.price,
+        })
+
         api.delete(`${endpoint}/${selected.id}`)
             .then(() => setRows(r => r.filter(x => x.id !== selected.id)))
-            .catch(err => setLogs(l => [...l, `Error deleting ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: selected.name,
+                    amount: selected.amount,
+                    price: selected.price,
+                })
+            )
             .finally(() => setShowDelete(false))
     }
 
-    const handleStock = (qty: number) => {
-        if (!selected) return setShowStock(null)
-        const action = showStock === 'in' ? 'increase-amount' : 'decrease-amount'
-        api.post(`/product/${selected.id}/${action}`, { amount: qty })
+
+    const handleStock = (item: { id: number; name: string; amount: number; price: number }, qty: number) => {
+        if (!item) { setShowStock(null); return }
+        const action = showStock === 'in' ? 'stock_in' : 'stock_out'
+
+        // формируем лог по операции со складом
+        addLog({
+            name: item.name,
+            amount: qty,
+            price: item.price,
+        })
+
+        api.post(`/product/${item.id}/${action === 'stock_in' ? 'increase-amount' : 'decrease-amount'}`, { amount: qty })
             .then(() => api.get('/product'))
             .then(res => setRows(res.data))
-            .catch(err => setLogs(l => [...l, `Error stock ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: item.name,
+                    amount: qty,
+                    price: item.price,
+                })
+            )
             .finally(() => setShowStock(null))
     }
 
-    if (!isAuthed) {
-        return <LoginForm onSubmit={async (u, p) => setToken(await doLogin(u, p))} />
-    }
-
+    // --- Columns definition ---
     const columns = mode === 'product'
         ? [
             { header: 'ID', accessor: 'id', width: 60 },
@@ -112,9 +181,29 @@ const App: React.FC = () => {
             { header: 'Опис', accessor: 'description' },
         ]
 
+    // --- Filtering rows ---
+    const filteredRows = rows.filter(row => {
+        const q = search.trim().toLowerCase()
+        if (!q) return true
+        if (filterColumn) {
+            const cell = String((row as any)[filterColumn] ?? '').toLowerCase()
+            return cell.includes(q)
+        }
+        return Object.values(row)
+            .join(' ')
+            .toLowerCase()
+            .includes(q)
+    })
+
+    // --- Render login or main UI ---
+    if (!isAuthed) {
+        return <LoginForm onSubmit={async (u, p) => setToken(await doLogin(u, p))} />
+    }
+
     return (
         <div className="app-container">
             <div className="main-row">
+                {/* Sidebar + Logs */}
                 <div className="sidebar-wrapper">
                     <Sidebar
                         mode={mode}
@@ -126,30 +215,27 @@ const App: React.FC = () => {
                         onStats={() => {}}
                         canDelete={selected !== null}
                     />
-                    {/* Логи под кнопками */}
-                    <div className="sidebar-logs" style={{ marginTop: 16 }}>
+                    <div className="sidebar-logs">
                         <ConsoleLog logs={logs} />
                     </div>
                 </div>
 
+                {/* Main content */}
                 <div className="content-wrapper">
                     <div className="search-wrapper">
                         <SearchBar
                             value={search}
                             onChange={setSearch}
                             onClear={() => setSearch('')}
+                            columns={columns}
+                            selected={filterColumn}
+                            onSelectColumn={setFilterColumn}
                         />
                     </div>
-
                     <div className="data-table-wrapper">
                         <DataTable
                             columns={columns}
-                            rows={rows.filter(r =>
-                                Object.values(r)
-                                    .join(' ')
-                                    .toLowerCase()
-                                    .includes(search.toLowerCase())
-                            )}
+                            rows={filteredRows}
                             onRowClick={row => {
                                 setSelected(row)
                                 setLogs(l => [...l, `Selected: ${row.id}`])
@@ -161,6 +247,7 @@ const App: React.FC = () => {
                 </div>
             </div>
 
+            {/* Modals */}
             <ModalForm
                 show={showAdd}
                 title={mode === 'product' ? 'Додати товар' : 'Додати групу'}
@@ -175,15 +262,13 @@ const App: React.FC = () => {
                 onCancel={() => setShowDelete(false)}
             />
 
-            {showStock && (
-                <StockModal
-                    show
-                    title={showStock === 'in' ? 'Приймання на склад' : 'Списання зі складу'}
-                    items={selected ? [selected] : []}
-                    onConfirm={handleStock}
-                    onCancel={() => setShowStock(null)}
-                />
-            )}
+            <StockModal
+                show={showStock !== null}
+                title={showStock === 'in' ? 'Приймання на склад' : 'Списання зі складу'}
+                items={rows}
+                onConfirm={handleStock}
+                onCancel={() => setShowStock(null)}
+            />
         </div>
     )
 }
