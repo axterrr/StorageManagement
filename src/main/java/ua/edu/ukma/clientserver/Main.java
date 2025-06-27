@@ -36,12 +36,13 @@ public class Main {
     private static final String KEYSTORE_PASSWORD_PROPERTY = "server.keystore.password";
 
     public static void main(String[] args) throws Exception {
+      
 //        SSLContext sslContext = createSSLContext();
-
+      
         int port = AppConfig.getInt(PORT_PROPERTY);
         InetSocketAddress address = new InetSocketAddress(port);
-
         HttpServer server = HttpServer.create(address, 0);
+  
 //        server.setHttpsConfigurator(new HttpsConfigurator(sslContext));
 
         setupRoutes(server);

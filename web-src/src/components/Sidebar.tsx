@@ -1,14 +1,17 @@
-import React from 'react';
-import { Button, Form } from 'react-bootstrap';
+// src/components/Sidebar.tsx
+import React from 'react'
+import { Button } from 'react-bootstrap'
 
-interface SidebarProps {
-    mode: 'product' | 'group';
-    onToggle: () => void;
-    onAdd: () => void;
-    onDelete: () => void;
-    onStockIn: () => void;
-    onStockOut: () => void;
-    onStats: () => void;
+export interface SidebarProps {
+    mode: 'product' | 'group'
+    onToggle: () => void
+    onAdd: () => void
+    onDelete: () => void
+    onStockIn: () => void
+    onStockOut: () => void
+    onStats: () => void
+    /** Новый проп: можно ли удалять */
+    canDelete?: boolean
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -18,46 +21,58 @@ const Sidebar: React.FC<SidebarProps> = ({
                                              onDelete,
                                              onStockIn,
                                              onStockOut,
-                                             onStats
+                                             onStats,
+                                             canDelete = false,       // по умолчанию – нельзя
                                          }) => (
-    <div className="d-flex flex-column h-100">
-        <Form.Check
-            type="switch"
-            id="toggle-mode"
-            label={
-                mode === 'product'
-                    ? 'Показати: Товари ↔ Групи'
-                    : 'Показати: Групи ↔ Товари'
-            }
-            onChange={onToggle}
-            className="mb-3"
-        />
-        <Button onClick={onAdd} className="mb-2">
+    <div className="sidebar p-3">
+        <Button
+            variant="outline-primary"
+            onClick={onToggle}
+            style={{ width: '100%', marginBottom: 8 }}
+        >
+            {mode === 'product' ? 'Показати групи' : 'Показати товари'}
+        </Button>
+
+        <Button
+            variant="primary"
+            onClick={onAdd}
+            style={{ width: '100%', marginBottom: 8 }}
+        >
             Додати
         </Button>
-        <Button onClick={onDelete} className="mb-2">
+        <Button
+            variant="danger"
+            onClick={onDelete}
+            disabled={!canDelete}
+            style={{ width: '100%', marginBottom: 8 }}
+        >
             Видалити
         </Button>
-        <div className="mt-auto">
-            <Button
-                variant="outline-primary"
-                onClick={onStockIn}
-                className="mb-2"
-            >
-                Прийом на склад
-            </Button>
-            <Button
-                variant="outline-secondary"
-                onClick={onStockOut}
-                className="mb-2"
-            >
-                Списання зі складу
-            </Button>
-            <Button variant="outline-success" onClick={onStats}>
-                Статистика
-            </Button>
-        </div>
-    </div>
-);
 
-export default Sidebar;
+        <hr />
+
+        <Button
+            variant="outline-success"
+            onClick={onStockIn}
+            style={{ width: '100%', marginBottom: 8 }}
+        >
+            Прийом на склад
+        </Button>
+        <Button
+            variant="outline-secondary"
+            onClick={onStockOut}
+            style={{ width: '100%', marginBottom: 8 }}
+        >
+            Списання зі складу
+        </Button>
+        <Button
+            variant="success"
+            onClick={onStats}
+            style={{ width: '100%' }}
+        >
+            Статистика
+        </Button>
+    </div>
+)
+
+export default Sidebar

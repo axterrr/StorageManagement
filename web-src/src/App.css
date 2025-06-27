@@ -1,4 +1,3 @@
-/* центрируем приложение и задаём ширину */
 .app-container {
   width: 90vw;
   max-width: 1600px;
@@ -9,23 +8,32 @@
   flex-direction: column;
 }
 
-/* контейнер строка: sidebar | контент | модалки */
 .main-row {
   flex: 1;
   display: flex;
   gap: 1rem;
 }
 
-/* Sidebar (~18%) */
 .sidebar-wrapper {
   flex: 0 0 18%;
 }
-.sidebar-wrapper .d-flex {
-  background: #ffffff;          /* белый фон */
-  border: 1px solid #dee2e6;    /* светло-серая рамка */
-  border-radius: 0.25rem;
-  padding: 0.75rem;
-  height: 100%;
+
+
+/* Сайдбар */
+.sidebar-wrapper {
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-right: 1px solid #ddd;
+}
+
+/* Контейнер логов */
+.sidebar-logs {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 8px;
+  background: #fafafa;
 }
 
 /* Основной контент (~64%) */
