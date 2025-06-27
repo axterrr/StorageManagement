@@ -13,16 +13,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private final DaoFactory daoFactory;
 
-    private StatisticsServiceImpl(DaoFactory daoFactory) {
+    public StatisticsServiceImpl(DaoFactory daoFactory) {
         this.daoFactory = daoFactory;
-    }
-
-    private static class Holder {
-        static final StatisticsService INSTANCE = new StatisticsServiceImpl(DaoFactory.getDaoFactory());
-    }
-
-    public static StatisticsService getInstance() {
-        return Holder.INSTANCE;
     }
 
     @Override
