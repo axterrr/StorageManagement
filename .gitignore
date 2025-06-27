@@ -37,3 +37,5 @@ build/
 .env
 application-local.properties
 keystore.jks
+web-src/localhost.pem
+web-src/localhost-key.pem
