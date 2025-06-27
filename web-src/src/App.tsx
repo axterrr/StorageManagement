@@ -53,8 +53,8 @@ const App: React.FC = () => {
         const path = mode === 'product'
             ? '/api/product_logs'
             : '/api/product_group_logs'
-        api.post(path, log).catch(err =>
-            setLogs(l => [...l, `Error writing log: ${err.message}`])
+        api.post(path, log).catch(
+            // setLogs(l => [...l, `Error writing log: ${err.message}`])
         )
     }
 
