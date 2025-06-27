@@ -12,25 +12,24 @@ import static ua.edu.ukma.clientserver.utils.ControllerUtils.sendJSONResponse;
 public class BaseController implements HttpHandler {
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        try {
-            switch (exchange.getRequestMethod()) {
-                case "GET" -> handleGet(exchange);
-                case "POST" -> handlePost(exchange);
-                case "PUT" -> handlePut(exchange);
-                case "DELETE" -> handleDelete(exchange);
-                default -> throw new NotSupportedMethodException();
+    public void handle(HttpExchange exchange) {
+        new Thread(() -> {
+            try {
+                switch (exchange.getRequestMethod()) {
+                    case "GET" -> handleGet(exchange);
+                    case "POST" -> handlePost(exchange);
+                    case "PUT" -> handlePut(exchange);
+                    case "DELETE" -> handleDelete(exchange);
+                    default -> throw new NotSupportedMethodException();
+                }
+            } catch (BaseException e) {
+                sendErrorResponse(exchange, e.getCode(), e.getMessage());
+            } catch (Exception e) {
+                sendErrorResponse(exchange, 500, "Unexpected error");
+            } finally {
+                exchange.close();
             }
-        } catch (BaseException e) {
-            sendErrorResponse(exchange, e.getCode(), e.getMessage());
-        } catch (Exception e) {
-            sendErrorResponse(exchange, 500, "Unexpected error");
-        } finally {
-            exchange.close();
-        }
+        }).start();
     }
 
     protected void handleGet(HttpExchange exchange) throws IOException {
@@ -49,8 +48,12 @@ public class BaseController implements HttpHandler {
         throw new NotSupportedMethodException();
     }
 
-    private void sendErrorResponse(HttpExchange exchange, int code, String message) throws IOException {
-        String response = String.format("{\"code\":%s, \"message\":\"%s\"}", code, message);
-        sendJSONResponse(exchange, code, response);
+    private void sendErrorResponse(HttpExchange exchange, int code, String message) {
+        try {
+            String response = String.format("{\"code\":%s, \"message\":\"%s\"}", code, message);
+            sendJSONResponse(exchange, code, response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
