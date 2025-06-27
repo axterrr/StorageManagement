@@ -39,6 +39,26 @@ const App: React.FC = () => {
     const [selected, setSelected] = useState<any | null>(null)
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null)
 
+    interface Log {
+        name: string
+        amount: number
+        price: number
+    }
+
+    const addLog = (log: Log) => {
+        setLogs(l => [
+            ...l,
+            `Log: ${log.name}, amount=${log.amount}, price=${log.price}`
+        ])
+        const path = mode === 'product'
+            ? '/api/product_logs'
+            : '/api/product_group_logs'
+        api.post(path, log).catch(err =>
+            setLogs(l => [...l, `Error writing log: ${err.message}`])
+        )
+    }
+
+
     // --- Load data on auth or mode change ---
     useEffect(() => {
         if (!isAuthed) return
@@ -75,42 +95,72 @@ const App: React.FC = () => {
     // --- Action handlers ---
     const handleAdd = (data: any) => {
         const endpoint = mode === 'product' ? '/product' : '/group'
-        api
-            .post(endpoint, data)
+        api.post(endpoint, data)
             .then(res => {
-                const newRow = mode === 'product' ? res.data : { id: res.data.id, ...data }
+                const newRow = mode === 'product'
+                    ? res.data
+                    : { id: res.data.id, ...data }
                 setRows(r => [...r, newRow])
-                setLogs(l => [...l, `${mode} created: ${res.data.id}`])
+                addLog({
+                    name: newRow.name,
+                    amount: newRow.amount,
+                    price: newRow.price,
+                })
             })
-            .catch(err => setLogs(l => [...l, `Error creating ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: data.name,
+                    amount: data.amount || 0,
+                    price: data.price || 0,
+                })
+            )
             .finally(() => setShowAdd(false))
     }
 
     const handleDelete = () => {
-        if (!selected) return setShowDelete(false)
+        if (!selected) { setShowDelete(false); return }
         const endpoint = mode === 'product' ? '/product' : '/group'
-        api
-            .delete(`${endpoint}/${selected.id}`)
+
+        addLog({
+            name: selected.name,
+            amount: selected.amount,
+            price: selected.price,
+        })
+
+        api.delete(`${endpoint}/${selected.id}`)
             .then(() => setRows(r => r.filter(x => x.id !== selected.id)))
-            .catch(err => setLogs(l => [...l, `Error deleting ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: selected.name,
+                    amount: selected.amount,
+                    price: selected.price,
+                })
+            )
             .finally(() => setShowDelete(false))
     }
 
-    const handleStock = (item: { id: number }, qty: number) => {
-        if (!item) {
-            setShowStock(null)
-            return
-        }
-        const action = showStock === 'in' ? 'increase-amount' : 'decrease-amount'
-        setLogs(l => [
-            ...l,
-            `Stock ${action.replace('-amount','')}: item id: ${item.id}, amount: ${qty}`
-        ])
-        api
-            .post(`/product/${item.id}/${action}`, { amount: qty })
+
+    const handleStock = (item: { id: number; name: string; amount: number; price: number }, qty: number) => {
+        if (!item) { setShowStock(null); return }
+        const action = showStock === 'in' ? 'stock_in' : 'stock_out'
+
+        // формируем лог по операции со складом
+        addLog({
+            name: item.name,
+            amount: qty,
+            price: item.price,
+        })
+
+        api.post(`/product/${item.id}/${action === 'stock_in' ? 'increase-amount' : 'decrease-amount'}`, { amount: qty })
             .then(() => api.get('/product'))
             .then(res => setRows(res.data))
-            .catch(err => setLogs(l => [...l, `Error stock ${mode}: ${err.message}`]))
+            .catch(err =>
+                addLog({
+                    name: item.name,
+                    amount: qty,
+                    price: item.price,
+                })
+            )
             .finally(() => setShowStock(null))
     }
 
